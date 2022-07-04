@@ -52,7 +52,7 @@ class Photo(core_models.TimeStampedModel):
 
     caption = models.CharField(max_length=80)
     file = models.ImageField()
-    room = models.ForeignKey("Room", on_delete=models.CASCADE)
+    room = models.ForeignKey("Room", related_name="photos", on_delete=models.CASCADE)
 
     def __str__(self):
         return self.caption
@@ -74,15 +74,21 @@ class Room(core_models.TimeStampedModel):
     check_in = models.TimeField()
     check_out = models.TimeField()
     instant_book = models.BooleanField(default=False)
-    host = models.ForeignKey(user_models.User, on_delete=models.CASCADE)
+    host = models.ForeignKey(
+        "users.User",
+        related_name="rooms",  # related_name: "users.User" 가 어떻게(어떤 이름으로) 이 모델(Room)을 찾기를 원합니까?
+        on_delete=models.CASCADE,
+    )
 
     # ForeignKey - room type 은 여러 개 중에 하나만 선택 가능.
     # models.SET_NULL - room type 을 삭제하더라도 ROOM 은 삭제되지 않도록.
     # null=True - db 에 값이 비어있어도 OK
-    room_type = models.ForeignKey(RoomType, on_delete=models.SET_NULL, null=True)
-    amenities = models.ManyToManyField(Amenity, blank=True)
-    facilities = models.ManyToManyField(Facility, blank=True)
-    house_rules = models.ManyToManyField(HouseRule, blank=True)
+    room_type = models.ForeignKey(
+        RoomType, related_name="rooms", on_delete=models.SET_NULL, null=True
+    )
+    amenities = models.ManyToManyField(Amenity, related_name="rooms", blank=True)
+    facilities = models.ManyToManyField(Facility, related_name="rooms", blank=True)
+    house_rules = models.ManyToManyField(HouseRule, related_name="rooms", blank=True)
 
     def __str__(self):  # admin 에서 클래스명을 다른 것으로 표시하고자 할 때.
         return self.name
