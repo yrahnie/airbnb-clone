@@ -112,3 +112,9 @@ class Room(core_models.TimeStampedModel):
         except ZeroDivisionError:
             avg = 0
         return round(avg, 2)
+
+    def first_photo(self):
+        (photo,) = self.photos.all()[
+            :1
+        ]  # photo 뒤에 , 는 unpacking values 를 의미. array 속 첫번째 value를 가져옴.
+        return photo.file.url
