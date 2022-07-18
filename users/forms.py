@@ -5,8 +5,10 @@ from . import models
 
 
 class LoginForm(forms.Form):
-    email = forms.EmailField()
-    password = forms.CharField(widget=forms.PasswordInput)
+    email = forms.EmailField(widget=forms.EmailInput(attrs={"placeholder": "Email"}))
+    password = forms.CharField(
+        widget=forms.PasswordInput(attrs={"placeholder": "Password"})
+    )
 
     # field 의 값을 확인하고자 할 때 clean_field-name 형태로 함수를 만들어야 함.
     # 이후 data 는 form.cleaned_data 로 확인 가능. return 해주지 않으면 NULL 값이 확인됨.
@@ -38,7 +40,39 @@ class LoginForm(forms.Form):
 
 # ModelForm: Model 에 연결된 Form
 # form 을 만들면 django 는 어떤 model 을 만들고 싶어하는지 암.
+# class Meta 로 어떤 model 의 form 을 만드는지 설정. (model, fields)
 # clean() method 를 통한 validate 을 따로 할 필요가 없음. (model 에 있는 필드라면. 없는 필드라면 validate 해야함)
 # 일반 Form 에는 없는 save() method 가 있음. override 가능.
 class SignUpForm(UserCreationForm):
-    username = forms.EmailField(label="Email")
+    class Meta:
+        model = models.User
+        fields = ("first_name", "last_name", "email")
+        widgets = {
+            "first_name": forms.TextInput(attrs={"placeholder": "First Name"}),
+            "last_name": forms.TextInput(attrs={"placeholder": "Last Name"}),
+            "email": forms.EmailInput(attrs={"placeholder": "Email Name"}),
+        }
+
+    # password 는 user 모델이 가지고 있는 것이 아니므로 따로 선언.
+    password = forms.CharField(
+        widget=forms.PasswordInput(attrs={"placeholder": "Password"})
+    )
+    password1 = forms.CharField(
+        widget=forms.PasswordInput(attrs={"placeholder": "Confirm Password"})
+    )
+
+    def clean_password1(self):
+        password = self.cleaned_data.get("password")
+        password1 = self.cleaned_data.get("password1")
+        if password != password1:
+            raise forms.ValidationError("Password confirmation does not match")
+        else:
+            return password
+
+    def save(self, *args, **kwargs):
+        user = super().save(commit=False)
+        email = self.cleaned_data.get("email")
+        password = self.cleaned_data.get("password")
+        user.username = email
+        user.set_password(password)
+        user.save()
