@@ -1,5 +1,15 @@
 @tailwind base;
 @tailwind components;
-@tailwind utilities;
 
-// em 은 가장 가까운 font-size 와 같음.
+.search-box {
+  transition: box-shadow 0.2s linear;
+}
+
+.nav_link {
+  @apply ml-8 border-b-2 border-white hover:border-b-gray-600 h-full flex items-center;
+  a {
+    @apply py-10 px-5;
+  }
+}
+
+@tailwind utilities;

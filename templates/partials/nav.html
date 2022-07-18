@@ -1,18 +1,15 @@
-<header>
-  <a href="{% url "core:home" %}">Nbnb</a>
-  <ul>
-    
-    {% comment %}
-      "user"는 어디서 오는가~?
-      context processor 가 cookie 를 갖져와서 user 를 찾고 그걸 template 에 자동으로 넣어줌.
-    {% endcomment %} 
-    {% if user.is_authenticated %}
-      <li><a href="{% url "users:logout" %}">Log out</a></li>  
-    {% else %}
-      <li><a href="{% url "users:login" %}">Log in</a></li>
-      <li><a href="{% url "users:signup" %}">Sign Up</a></li>
-    {% endif %}
-    
-  </ul>
+<ul class="flex items-center text-sm font-medium h-full">
   
-</header>
+  {% comment %}
+    "user"는 어디서 오는가~?
+    context processor 가 cookie 를 갖져와서 user 를 찾고 그걸 template 에 자동으로 넣어줌.
+  {% endcomment %} 
+  {% if user.is_authenticated %}
+    <li class="nav_link"><a href="{% url "users:logout" %}">Log out</a></li>  
+  {% else %}
+    <li class="nav_link"><a href="{% url "users:login" %}">Log in</a></li>
+    <li class="nav_link"><a href="{% url "users:signup" %}">Sign Up</a></li>
+  {% endif %}
+  
+</ul>
+  
