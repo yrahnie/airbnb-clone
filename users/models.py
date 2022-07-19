@@ -5,6 +5,7 @@ from django.contrib.auth.models import AbstractUser
 from django.core.mail import send_mail
 from django.db import models
 from django.template.loader import render_to_string  # template 을 load 해서 render
+from django.urls import reverse
 from django.utils.html import strip_tags
 
 
@@ -66,6 +67,10 @@ class User(AbstractUser):
     login_method = models.CharField(
         max_length=50, choices=LOGIN_CHOICES, default=LOGIN_EMAIL
     )
+
+    # admin 패널에서 객체(object)를 보고 싶다면, get_absolute_url 아주 요긴함.
+    def get_absolute_url(self):
+        return reverse("users:profile", kwargs={"pk": self.pk})
 
     def verify_email(self):
         if self.email_verified is False:
