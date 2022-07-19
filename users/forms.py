@@ -1,5 +1,4 @@
 from django import forms
-from django.contrib.auth.forms import UserCreationForm
 
 from . import models
 
@@ -43,7 +42,7 @@ class LoginForm(forms.Form):
 # class Meta 로 어떤 model 의 form 을 만드는지 설정. (model, fields)
 # clean() method 를 통한 validate 을 따로 할 필요가 없음. (model 에 있는 필드라면. 없는 필드라면 validate 해야함)
 # 일반 Form 에는 없는 save() method 가 있음. override 가능.
-class SignUpForm(UserCreationForm):
+class SignUpForm(forms.ModelForm):
     class Meta:
         model = models.User
         fields = ("first_name", "last_name", "email")
@@ -60,6 +59,16 @@ class SignUpForm(UserCreationForm):
     password1 = forms.CharField(
         widget=forms.PasswordInput(attrs={"placeholder": "Confirm Password"})
     )
+
+    def clean_email(self):
+        email = self.cleaned_data.get("email")
+        try:
+            models.User.objects.get(email=email)
+            raise forms.ValidationError(
+                "That email is already taken", code="existing_user"
+            )
+        except models.User.DoesNotExist:
+            return email
 
     def clean_password1(self):
         password = self.cleaned_data.get("password")
