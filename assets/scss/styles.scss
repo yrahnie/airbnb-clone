@@ -17,20 +17,56 @@
 }
 
 input {
-  @apply w-full font-light text-sm rounded-sm py-3 text-left border border-gray-600 px-5 focus:outline-none focus:border-teal-500;
+  @apply w-full font-light text-sm rounded-sm py-3 mb-2 text-left border border-gray-600 px-5 focus:outline-none focus:border-teal-500;
 }
 
 form {
   .input {
-    @apply mb-3;
+    @apply mb-2 w-full;
     &.has_error {
       input {
-        @apply bg-red-200 border-gray-400;
+        @apply bg-red-200 border-gray-600;
         &:focus {
           @apply border-gray-600;
         }
       }
     }
+  }
+}
+
+@keyframes messageFadeIn {
+  0% {
+    opacity: 0;
+    transform: translateY(-50px);
+  }
+  5% {
+    opacity: 1;
+    transform: translateY(50px);
+  }
+  95% {
+    opacity: 1;
+    transform: translateY(50px);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-50px);
+  }
+}
+
+.message {
+  animation: messageFadeIn 5s ease-in-out forwards;
+  &.error {
+    @apply bg-red-600;
+  }
+  &.info {
+    @apply bg-blue-500;
+  }
+  &.success {
+    @apply bg-green-500;
+  }
+  &.warning {
+    @apply bg-yellow-400;
+  }
 }
 
 @tailwind utilities;
