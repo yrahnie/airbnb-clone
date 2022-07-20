@@ -6,9 +6,12 @@
 }
 
 .nav_link {
-  @apply ml-8 border-b-2 border-white hover:border-b-gray-600 h-full flex items-center;
+  @apply ml-6 border-b-2 border-white h-full flex items-center;
   a {
     @apply py-10 px-5;
+  }
+  &:hover {
+    @apply border-gray-600;
   }
 }
 
@@ -20,8 +23,19 @@
   @apply w-full text-center font-light text-sm py-2 rounded-lg text-white bg-red-500;
 }
 
-input {
+input,
+textarea,
+select {
   @apply w-full font-light text-sm rounded-sm py-3 mb-2 text-left border border-gray-600 px-5 focus:outline-none focus:border-teal-500;
+}
+
+textarea {
+  resize: none;
+  height: 100px;
+}
+
+select {
+  height: 50px;
 }
 
 form {

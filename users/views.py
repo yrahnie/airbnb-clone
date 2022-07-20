@@ -3,16 +3,18 @@ import os
 import requests
 from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth.views import PasswordChangeView
+from django.contrib.messages.views import SuccessMessageMixin
 from django.core.files.base import ContentFile
 from django.shortcuts import redirect, render, reverse
 from django.urls import reverse_lazy
 from django.views import View
 from django.views.generic import DetailView, FormView, UpdateView
 
-from . import forms, models
+from . import forms, mixins, models
 
 
-class LoginView(FormView):
+class LoginView(mixins.LoggedOutOnlyView, FormView):
     template_name = "users/login.html"
     form_class = forms.LoginForm
 
@@ -221,13 +223,14 @@ class UserProfileView(DetailView):
         return context
 
 
-class UpdateProfileView(UpdateView):
+class UpdateProfileView(SuccessMessageMixin, UpdateView):
     model = models.User
     template_name = "users/update-profile.html"
     fields = (
+        # "email",
         "first_name",
         "last_name",
-        "avatar",
+        # "avatar",
         "gender",
         "bio",
         "birthday",
@@ -235,5 +238,46 @@ class UpdateProfileView(UpdateView):
         "currency",
     )
 
+    success_message = "Profile Updated"
+
+    # UpdateView 는 객체(object) 를 요구함.
     def get_object(self, queryset=None):
         return self.request.user
+
+    # UpdateView 를 통해 view 를 구성했을 경우 form 에 placeholder 를 설정해주기 위해 사용됨.
+    def get_form(self, form_class=None):
+        form = super().get_form(form_class)
+        form.fields["first_name"].widget.attrs = {"placeholder": "First name"}
+        form.fields["last_name"].widget.attrs = {"placeholder": "Last name"}
+        form.fields["gender"].widget.attrs = {"placeholder": "Gender"}
+        form.fields["bio"].widget.attrs = {"placeholder": "Bio"}
+        form.fields["birthday"].widget.attrs = {"placeholder": "Birthday"}
+        form.fields["language"].widget.attrs = {"placeholder": "Language"}
+        form.fields["currency"].widget.attrs = {"placeholder": "Currency"}
+        return form
+
+    # email 을 update 할 경우 username 을 변경한 email 로 함께 update 하기 위한 code.
+    # fields 에 "email" 을 추가하고.
+    # def form_valid(self, form):
+    #     email = form.cleaned_data.get("email")
+    #     self.object.username = email
+    #     self.object.save()
+    #     return super().form_valid(form)
+
+
+class UpdatePasswordView(SuccessMessageMixin, PasswordChangeView):
+    template_name = "users/update-password.html"
+    success_message = "Password Updated"
+
+    def get_form(self, form_class=None):
+        form = super().get_form(form_class)
+        form.fields["old_password"].widget.attrs = {"placeholder": "Current password"}
+        form.fields["new_password1"].widget.attrs = {"placeholder": "New password"}
+        form.fields["new_password2"].widget.attrs = {
+            "placeholder": "Confirm new password"
+        }
+        return form
+
+    # Return the URL to redirect to after processing a valid form.
+    def get_success_url(self):
+        return self.request.user.get_absolute_url()

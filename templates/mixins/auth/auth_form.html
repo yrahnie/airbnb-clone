@@ -1,4 +1,5 @@
-<form method="POST" class="w-full">
+<form method="POST" class="w-full" enctype="multipart/form-data">
+  {% comment %} avatar 사진을 update 했을 때 enctype 을 설정해주지 않으면 update 되지 않음. {% endcomment %}
     {% csrf_token %} 
 
     {% if form.non_field_errors %}
