@@ -1,0 +1,16 @@
+<form method="POST" class="w-full" enctype="multipart/form-data">
+  {% comment %} avatar 사진을 update 했을 때 enctype 을 설정해주지 않으면 update 되지 않음. {% endcomment %}
+    {% csrf_token %} 
+
+    {% if form.non_field_errors %}
+      {% for error in form.non_field_errors %}
+        <span class="text-red-700 font-medium text-sm">{{error}}</span>
+      {% endfor %}
+    {% endif %}
+
+    {% for field in form %}
+      {% include 'mixins/room/room_input.html' with field=field %}      
+    {% endfor %}
+
+    <button class="btn bg-red-500 text-white">{{cta}}</button>
+</form>

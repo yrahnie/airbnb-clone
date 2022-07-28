@@ -118,3 +118,8 @@ class Room(core_models.TimeStampedModel):
             :1
         ]  # photo 뒤에 , 는 unpacking values 를 의미. array 속 첫번째 value를 가져옴.
         return photo.file.url
+
+    def get_next_four_photos(self):
+        photos = self.photos.all()[1:5]
+        print(photos)
+        return photos

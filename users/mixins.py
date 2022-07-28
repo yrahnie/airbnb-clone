@@ -4,6 +4,7 @@ from django.shortcuts import redirect
 from django.urls import reverse_lazy
 
 
+# Email 로 로그인한 사람만 update password 페이지를 보여주기 위한 mixins
 class EmailLoginOnlyView(UserPassesTestMixin):
     def test_func(self):
         return self.request.user.login_method == "email"
