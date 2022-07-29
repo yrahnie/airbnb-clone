@@ -1,3 +1,4 @@
+from cal import Calendar
 from core import models as core_models
 from django.db import models
 from django.urls import reverse
@@ -126,3 +127,8 @@ class Room(core_models.TimeStampedModel):
         photos = self.photos.all()[1:5]
         print(photos)
         return photos
+
+    def get_calendars(self):
+        this_month = Calendar(2019, 11)
+        next_month = Calendar(2019, 12)
+        return [this_month, next_month]
