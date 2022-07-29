@@ -186,14 +186,8 @@ class EditPhotoView(user_mixins.LoggedInOnlyView, SuccessMessageMixin, UpdateVie
 
 
 class AddPhotoView(user_mixins.LoggedInOnlyView, FormView):
-    model = models.Photo
-    template_name = "rooms/photo_create.html"
-
-    fields = (
-        "caption",
-        "file",
-    )
     form_class = forms.CreatePhotoForm
+    template_name = "rooms/photo_create.html"
 
     def form_valid(self, form):
         pk = self.kwargs.get("pk")
@@ -201,3 +195,16 @@ class AddPhotoView(user_mixins.LoggedInOnlyView, FormView):
         messages.success(self.request, "Photo Uploaded")
         form.save(pk)
         return redirect(reverse("rooms:photos", kwargs={"pk": pk}))
+
+
+class CreateRoomView(user_mixins.LoggedInOnlyView, FormView):
+    form_class = forms.CreateRoomForm
+    template_name = "rooms/room_create.html"
+
+    def form_valid(self, form):
+        room = form.save()
+        room.host = self.request.user
+        room.save()
+        form.save_m2m()  # many-to-many 아이템을 저장하는 method. object save 이후에 해줘야 함.
+        messages.success(self.request, "Room Created")
+        return redirect(reverse("rooms:detail", kwargs={"pk": room.pk}))
