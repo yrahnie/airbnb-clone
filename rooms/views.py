@@ -5,7 +5,7 @@ from django.core.paginator import Paginator
 from django.http import Http404
 from django.shortcuts import redirect, render
 from django.urls import reverse, reverse_lazy
-from django.views.generic import DetailView, ListView, UpdateView, View
+from django.views.generic import DetailView, FormView, ListView, UpdateView, View
 from django_countries import countries
 from users import mixins as user_mixins
 
@@ -167,6 +167,7 @@ def delete_photo(request, room_pk, photo_pk):
             messages.error(request, "Can't delete that photo")
         else:
             models.Photo.objects.filter(pk=photo_pk).delete()
+            messages.success(request, "Photo Deleted")
         return redirect(reverse("rooms:photos", kwargs={"pk": room_pk}))
     except models.Room.DoesNotExist:
         return redirect(reverse("core:home"))
@@ -182,3 +183,21 @@ class EditPhotoView(user_mixins.LoggedInOnlyView, SuccessMessageMixin, UpdateVie
     def get_success_url(self):
         room_pk = self.kwargs.get("room_pk")
         return reverse("rooms:photos", kwargs={"pk": room_pk})
+
+
+class AddPhotoView(user_mixins.LoggedInOnlyView, FormView):
+    model = models.Photo
+    template_name = "rooms/photo_create.html"
+
+    fields = (
+        "caption",
+        "file",
+    )
+    form_class = forms.CreatePhotoForm
+
+    def form_valid(self, form):
+        pk = self.kwargs.get("pk")
+        # SuccessMessageMixin 을 쓰면 form_valid 를 사용할 수 없어서 아래와 같이 추가
+        messages.success(self.request, "Photo Uploaded")
+        form.save(pk)
+        return redirect(reverse("rooms:photos", kwargs={"pk": pk}))
